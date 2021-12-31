@@ -1,2 +1,2 @@
 # MMR
-A implementation of Merkle Mountain Ranges in Golang
+A implementation of an accumulator based on Merkle Mountain Ranges in Golang
