@@ -95,6 +95,8 @@ func (m *MMR) Add(element []byte) *Witness {
 	m.Len++
 	return res
 }
+
+// MemVerify verify an element with provided witness based on the accumulator
 func (m *MMR) MemVerify(element []byte, witness *Witness) bool {
 	ancestors := GetAncestor(element, witness)
 	root := ancestors[len(ancestors)-1]
@@ -130,6 +132,30 @@ func GetAncestor(element []byte, witness *Witness) [][]byte {
 		copy(tmp, c)
 		res = append(res, tmp)
 		pos++
+	}
+	return res
+}
+
+func (m *MMR) Bagging() []byte {
+	hashFunc := m.Hash()
+
+	res := make([]byte, hashFunc.Size())
+	if len(m.Peaks) == 0 {
+		return m.Zero
+	}
+	if len(m.Peaks) == 1 {
+		return m.Peaks[0]
+	}
+	length := len(m.Peaks)
+	hashFunc.Reset()
+	hashFunc.Write(m.Peaks[length-1])
+	hashFunc.Write(m.Peaks[length-2])
+	copy(res, hashFunc.Sum(nil))
+	for i := length - 3; i >= 0; i-- {
+		hashFunc.Reset()
+		hashFunc.Write(res)
+		hashFunc.Write(m.Peaks[i])
+		copy(res, hashFunc.Sum(nil))
 	}
 	return res
 }
