@@ -63,7 +63,8 @@ func (m *MMR) Add(element []byte) *Witness {
 	pos := 0
 	z := make([]byte, hashFunc.Size())
 	hashFunc.Reset()
-	copy(z, hashFunc.Sum(element))
+	hashFunc.Write(element)
+	copy(z, hashFunc.Sum(nil))
 	for pos < len(m.Peaks) && m.Peaks[pos] != nil {
 		if bytes.Equal(m.Peaks[pos], m.Zero) {
 			break
@@ -113,7 +114,8 @@ func GetAncestor(element []byte, witness *Witness) [][]byte {
 	f.Reset()
 
 	c := make([]byte, f.Size())
-	copy(c, f.Sum(element))
+	f.Write(element)
+	copy(c, f.Sum(nil))
 	tmp := make([]byte, f.Size())
 	copy(tmp, c)
 	res = append(res, tmp)

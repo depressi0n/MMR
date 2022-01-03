@@ -13,6 +13,9 @@ type MerkleTree struct {
 
 // NewMerkleTree construct a merkle tree from elements, and generate the merkle proof of indexes in proveIndex
 func NewMerkleTree(hash HashFunc, element [][]byte, proveIndex []int) (*MerkleTree, map[int]*Witness) {
+	if len(element) == 0 {
+		return nil, nil
+	}
 	// compute the height of merkle tree
 	height, count := 0, len(element)
 	for count != 0 {
@@ -90,14 +93,14 @@ func NewMerkleTree(hash HashFunc, element [][]byte, proveIndex []int) (*MerkleTr
 		Len:  len(element),
 		Hash: hash,
 		Zero: zero,
-	}, nil
+	}, m
 }
 
 func Verify(element []byte, witness *Witness, root []byte) bool {
 	path := GetAncestor(element, witness)
 	if bytes.Equal(path[len(path)-1], root) {
-		return false
-	} else {
 		return true
+	} else {
+		return false
 	}
 }
